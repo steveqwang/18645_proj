@@ -112,14 +112,12 @@ int *crossover(int *father, int *mother) {
   int i = 0;
   
   for (i = 0; i < crs_idx; i+=4){
-    int array[4] = {father[i], father[i+1], father[i+2], father[i+3]};
-    __m128i xmm = _mm_loadu_si128((__m128i *) array);
+    __m128i xmm = _mm_load_si128((__m128i *)&father[i]);
     _mm_store_si128((__m128i *)&child[i], xmm);
   }
   
   for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4){
-    int array[4] = {mother[i], mother[i+1], mother[i+2], mother[i+3]};
-    __m128i xmm = _mm_loadu_si128((__m128i *) array);
+    __m128i xmm = _mm_load_si128((__m128i *)&mother[i]);
     _mm_store_si128((__m128i *)&child[i], xmm);
   }
   
