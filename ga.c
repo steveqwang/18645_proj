@@ -5,7 +5,6 @@
 #include <time.h>
 #include <immintrin.h>
 #include <immintrin.h>
-#include <smmintrin.h>
 
 int POPULATION_SIZE;
 #define INDIVIDUAL_SIZE 64
@@ -112,21 +111,22 @@ int *crossover(int *father, int *mother) {
   int *child = (int *)malloc(INDIVIDUAL_SIZE * sizeof(int));
   int i = 0;
   
-  // for (i = 0; i < crs_idx; i+=4){
-  //   // mm_load ... child[i], father[i]
-  //   __m128i values;
-  //   int array[4] = {father[i], father[i+1], father[i+2], father[i+3]};
-  //   values = _mm_loadu_si128((__m128i*) array);
-    
-  // }
-  // for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4){
-  //   // mm_load ... child[i], mother[i]
-  // }
+  for (i = 0; i < crs_idx; i+=4){
+    int array[4] = {father[i], father[i+1], father[i+2], father[i+3]};
+    __m128i xmm = _mm_loadu_si128((__m128 *) array);
+    _mm_store_si128(child[i], xmm);
+  }
   
-  for (i = 0; i < crs_idx; i+=4)
-    child[i] = father[i];
-  for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4)
-    child[i] = mother[i];
+  for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4){
+    int array[4] = {mother[i], mother[i+1], mother[i+2], mother[i+3]};
+    __m128i xmm = _mm_loadu_si128((__m128 *) array);
+    _mm_store_si128(child[i], xmm);
+  }
+  
+  // for (i = 0; i < crs_idx; i+=4)
+  //   child[i] = father[i];
+  // for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4)
+  //   child[i] = mother[i];
 
   return child;
 }
