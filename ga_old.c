@@ -111,44 +111,20 @@ int *crossover(int *father, int *mother) {
   int crs_idx = INDIVIDUAL_SIZE / 2;
   int *child = (int *)malloc(INDIVIDUAL_SIZE * sizeof(int));
   int i = 0;
-  for (i = 0; i < crs_idx; i+=4){
-    __m128i xmm = _mm_load_si128((__m128i *)&father[i]);
-    _mm_store_si128((__m128i *)&child[i], xmm);
-  }
-  for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4){
-    __m128i xmm = _mm_load_si128((__m128i *)&mother[i]);
-    _mm_store_si128((__m128i *)&child[i], xmm);
-  }
-  // for (i = 0; i < crs_idx; i+=4)
-  //   child[i] = father[i];
-  // for (i = crs_idx; i < INDIVIDUAL_SIZE; i+=4)
-  //   child[i] = mother[i];
+  for (i = 0; i < crs_idx; i++)
+    child[i] = father[i];
+  for (i = crs_idx; i < INDIVIDUAL_SIZE; i++)
+    child[i] = mother[i];
   return child;
 }
 
-// int method0 (__m128i* value){
-//   int index, total = 0;
-//   uint32_t *buffer = (void *) &value;
-//   for (index = 0; index < 4; index++)
-//       total += buffer [index] == 0xFFFFFFFF;
-//   return total;
-// }
-
 double fitness(int *base, int *target) {
   int correct = 0.0;
-  __m128i result[4];
-  for (int i = 0; i < INDIVIDUAL_SIZE; i+=4) {
-    __m128i v1 = _mm_load_si128((__m128i *)&base[i]);
-    __m128i v2 = _mm_load_si128((__m128i *)&target[i]);
-    __m128i vcmp = _mm_cmpeq_epi32(v1, v2);
-    int count = __builtin_popcount(_mm_movemask_epi8(vcmp));
-    correct += count;
+  for (int i = 0; i < INDIVIDUAL_SIZE; i++) {
+    if (base[i] == target[i]) {
+      correct += 1;
+    }
   }
-  // for (int i = 0; i < INDIVIDUAL_SIZE; i++) {
-  //   if (base[i] == target[i]) {
-  //     correct += 1;
-  //   }
-  // }
   return (double)correct;
 }
 
