@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 int POPULATION_SIZE;
-#define INDIVIDUAL_SIZE 64
+#define INDIVIDUAL_SIZE 256
 
 static __inline__ unsigned long long rdtsc(void) {
   unsigned hi, lo;
@@ -19,7 +19,6 @@ static __inline__ unsigned long long rdtsc(void) {
 int *crossover(int *father, int *mother);
 int method0 (__m128i* value);
 double fitness(int *base, int *target);
-
 int **selection(int **population, int *target);
 void sub_main(int size);
 int **init();
@@ -47,24 +46,11 @@ void sub_main(int size) {
   POPULATION_SIZE = size;
   int **population = init();
   int *target = generate_individual();
-  // printf("target & init population: \n");
-  // print_individual(target);
-  // printf("\n");
-
-  // print_population(population);
-
   uint64_t start = rdtsc();
   int** new_population = selection(population, target);
-  // printf("\n");
-  // print_population(new_population);
   uint64_t end = rdtsc();
-
   uint64_t latency = end - start;
-
-  printf("%ld\n", latency); // required to prevent the compiler from optimizing it out
-  // printf("Latency: %lf\n", MAX_FREQ/BASE_FREQ * latency);   //find the
-  // average latency over multiple runs
-
+  printf("%ld\n", latency); 
   free_population(new_population);
   free_population(population);
   free_individual(target);
@@ -163,12 +149,23 @@ int **selection(int **population, int *target) {
   }
   for(int i = 0; i < POPULATION_SIZE; i++) {
     int pivot = rand() % total_score;
-    for (int j = 0; j < POPULATION_SIZE; j++) {
-      if (scores[j] >= pivot) {
-        mating_pool[i] = j;
-        break;
+    int l = 0, r = POPULATION_SIZE-1;
+    while (l < r) {
+      int m = l + (r-l)/2;
+      if (scores[m] < pivot) {
+        l = m + 1;
+      } else {
+        r = m;
       }
     }
+    mating_pool[i] = l;
+
+    // for (int j = 0; j < POPULATION_SIZE; j++) {
+    //   if (scores[j] >= pivot) {
+    //     mating_pool[i] = j;
+    //     break;
+    //   }
+    // }
   }
 
   int **new_population = (int **)malloc(sizeof(int *) * POPULATION_SIZE);

@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 int POPULATION_SIZE;
-#define INDIVIDUAL_SIZE 64
+#define INDIVIDUAL_SIZE 256
 
 static __inline__ unsigned long long rdtsc(void) {
   unsigned hi, lo;
