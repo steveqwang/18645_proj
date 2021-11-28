@@ -143,6 +143,7 @@ double fitness(int *base, int *target) {
     __m128i vcmp = _mm_cmpeq_epi32(v1, v2);
     int count = __builtin_popcount(_mm_movemask_epi8(vcmp));
     correct += count;
+    
   }
   // for (int i = 0; i < INDIVIDUAL_SIZE; i++) {
   //   if (base[i] == target[i]) {
