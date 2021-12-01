@@ -6,6 +6,7 @@
 #include <immintrin.h>
 #include <immintrin.h>
 #include <stdbool.h>
+#include <omp.h>
 
 int POPULATION_SIZE;
 #define INDIVIDUAL_SIZE 256
@@ -142,11 +143,13 @@ int **selection(int **population, int *target) {
   int *mating_pool = (int *)malloc(sizeof(int) * POPULATION_SIZE);
   int *scores = (int *)malloc(sizeof(int) * POPULATION_SIZE);
   int total_score = 0;
-  
-  for (int i = 0; i < POPULATION_SIZE; i++) {
+  int i;
+  #pragma omp parallel for num_threads(8) reduction(+ : total_score) schedule(static, POPULATION_SIZE/8)
+  for (i = 0; i < POPULATION_SIZE; i++) {
     total_score += (int)fitness(population[i], target);
     scores[i] = total_score;
   }
+  // Binary Search
   for(int i = 0; i < POPULATION_SIZE; i++) {
     int pivot = rand() % total_score;
     int l = 0, r = POPULATION_SIZE-1;
